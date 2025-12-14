@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/notifiers/task_notifier.dart';
 import '../widgets/todo_summary_counter.dart';
 import '../widgets/task_list.dart';
+import '../widgets/add_task_dialog.dart';
 
 class MyHomePage extends ConsumerWidget {
   const MyHomePage({super.key, required this.title});
@@ -77,10 +78,21 @@ class MyHomePage extends ConsumerWidget {
   }
 
   Widget _buildAddTaskButton() {
-    return FloatingActionButton(
-      onPressed: () {},
-      tooltip: 'Add Task',
-      child: const Icon(Icons.add),
+    return Builder(
+      builder: (context) => FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (context) => const AddTaskBottomSheet(),
+          );
+        },
+        tooltip: 'Add Task',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

@@ -1,7 +1,16 @@
+import 'package:hive/hive.dart';
+
+part 'task.g.dart';
+
+@HiveType(typeId: 0)
 enum TaskPriority {
+  @HiveField(0)
   low,
+  @HiveField(1)
   medium,
+  @HiveField(2)
   high,
+  @HiveField(3)
   urgent;
 
   String get label {
@@ -18,13 +27,27 @@ enum TaskPriority {
   }
 }
 
-class Task {
+@HiveType(typeId: 1)
+class Task extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String title;
+
+  @HiveField(2)
   final String description;
+
+  @HiveField(3)
   final bool isCompleted;
+
+  @HiveField(4)
   final DateTime createdAt;
+
+  @HiveField(5)
   final TaskPriority priority;
+
+  @HiveField(6)
   final DateTime? dueDate;
 
   Task({
