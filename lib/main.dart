@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/presentation/screens/HomeScreen.dart';
+import 'features/presentation/screens/home_screen.dart';
 import 'core/app_fonts.dart';
 
 void main() {

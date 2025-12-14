@@ -9,32 +9,44 @@ class TaskNotifier extends StateNotifier<TaskState> {
 
   // Khởi tạo tasks mẫu
   void _initializeTasks() {
+    final now = DateTime.now();
     final initialTasks = [
       Task(
         id: '1',
         title: 'Complete Flutter project',
         description: 'Finish the todo app',
         isCompleted: false,
-        createdAt: DateTime.now(),
+        createdAt: now,
         priority: TaskPriority.urgent,
+        dueDate: now.add(const Duration(hours: 12)), // Sắp đến hạn
       ),
       Task(
         id: '2',
         title: 'Review code',
         description: 'Review pull requests',
         isCompleted: false,
-        createdAt: DateTime.now(),
+        createdAt: now,
         priority: TaskPriority.high,
+        dueDate: now.add(const Duration(days: 2)),
       ),
       Task(
         id: '3',
         title: 'Write documentation',
         description: 'Update README file',
         isCompleted: true,
-        createdAt: DateTime.now(),
+        createdAt: now.subtract(const Duration(days: 1)),
         priority: TaskPriority.low,
+        dueDate: now.subtract(
+          const Duration(hours: 2),
+        ), // Đã quá hạn nhưng completed
       ),
     ];
+
+    // Debug: In ra tasks để kiểm tra
+    for (var task in initialTasks) {
+      print('Task ${task.id}: dueDate = ${task.dueDate}');
+    }
+
     state = state.copyWith(tasks: initialTasks);
   }
 

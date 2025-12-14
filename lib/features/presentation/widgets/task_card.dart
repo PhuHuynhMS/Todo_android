@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../domain/entities/task.dart';
 import '../../application/notifiers/task_notifier.dart';
 import 'custom_chip.dart';
@@ -11,6 +12,9 @@ class TaskCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Debug: In ra dueDate
+    debugPrint('Task ${task.id}: dueDate = ${task.dueDate}');
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -20,27 +24,29 @@ class TaskCard extends ConsumerWidget {
             ref.read(taskProvider.notifier).toggleTaskComplete(task.id);
           },
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                task.title,
-                style: TextStyle(
-                  decoration: task.isCompleted
-                      ? TextDecoration.lineThrough
-                      : null,
-                ),
-              ),
-            ),
-            _buildPriorityChip(task.priority),
-          ],
+        title: Text(
+          task.title,
+          style: TextStyle(
+            decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+          ),
         ),
-        subtitle: task.description.isNotEmpty ? Text(task.description) : null,
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () {
-            ref.read(taskProvider.notifier).deleteTask(task.id);
-          },
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (task.description.isNotEmpty) ...[
+              Text(task.description),
+              const SizedBox(height: 4),
+            ],
+            Row(
+              children: [
+                _buildPriorityChip(task.priority),
+                if (task.dueDate != null) ...[
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildDueDateInfo(task)),
+                ],
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -74,6 +80,46 @@ class TaskCard extends ConsumerWidget {
       color: color,
       icon: icon,
       showIcon: true,
+    );
+  }
+
+  Widget _buildDueDateInfo(Task task) {
+    final dueDate = task.dueDate!;
+    final formatter = DateFormat('dd/MM HH:mm');
+    final dateText = formatter.format(dueDate);
+
+    Color color;
+    IconData icon;
+
+    if (task.isOverdue) {
+      // Quá hạn
+      color = Colors.red;
+      icon = Icons.warning;
+    } else if (task.isDueSoon) {
+      // Sắp đến hạn (trong 24h)
+      color = Colors.orange;
+      icon = Icons.schedule;
+    } else {
+      // Bình thường
+      color = Colors.green;
+      icon = Icons.calendar_today;
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(
+          dateText,
+          style: TextStyle(
+            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
