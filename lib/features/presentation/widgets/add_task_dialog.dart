@@ -73,113 +73,164 @@ class _AddTaskBottomSheetState extends ConsumerState<AddTaskBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'New Task',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _titleController,
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                    hintText: 'Enter task title',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter a title';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    hintText: 'Enter task description',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Priority',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: TaskPriority.values.map((priority) {
-                    final isSelected = _selectedPriority == priority;
-                    return _buildPriorityChip(priority, isSelected);
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                InkWell(
-                  onTap: _selectDueDate,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Due Date',
-                      border: OutlineInputBorder(),
-                      suffixIcon: Icon(Icons.calendar_today),
-                    ),
-                    child: Text(
-                      _selectedDueDate == null
-                          ? 'Select due date (optional)'
-                          : DateFormat(
-                              'MMM dd, yyyy HH:mm',
-                            ).format(_selectedDueDate!),
-                      style: TextStyle(
-                        color: _selectedDueDate == null
-                            ? Colors.grey
-                            : Theme.of(context).textTheme.bodyLarge?.color,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _submitTask,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text('Add Task'),
-                  ),
-                ),
-              ],
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 16),
+                  _buildTitleField(),
+                  const SizedBox(height: 16),
+                  _buildDescriptionField(),
+                  const SizedBox(height: 16),
+                  _buildPrioritySection(),
+                  const SizedBox(height: 16),
+                  _buildDueDateField(),
+                  const SizedBox(height: 24),
+                  _buildActionButtons(),
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('New Task', style: Theme.of(context).textTheme.headlineSmall),
+        IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTitleField() {
+    return TextFormField(
+      controller: _titleController,
+      autofocus: true,
+      decoration: InputDecoration(
+        labelText: 'Title',
+        hintText: 'Enter task title',
+        filled: true,
+        fillColor: Colors.grey[50],
+        border: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Please enter a title';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDescriptionField() {
+    return TextFormField(
+      controller: _descriptionController,
+      decoration: InputDecoration(
+        labelText: 'Description',
+        hintText: 'Enter task description',
+        filled: true,
+        fillColor: Colors.grey[50],
+        border: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      maxLines: 3,
+    );
+  }
+
+  Widget _buildPrioritySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Priority', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: TaskPriority.values.map((priority) {
+            final isSelected = _selectedPriority == priority;
+            return _buildPriorityChip(priority, isSelected);
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDueDateField() {
+    return InkWell(
+      onTap: _selectDueDate,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'Due Date',
+          filled: true,
+          fillColor: Colors.grey[50],
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          suffixIcon: const Icon(Icons.calendar_today),
+        ),
+        child: Text(
+          _selectedDueDate == null
+              ? 'Select due date (optional)'
+              : DateFormat('MMM dd, yyyy HH:mm').format(_selectedDueDate!),
+          style: TextStyle(
+            color: _selectedDueDate == null
+                ? Colors.grey
+                : Theme.of(context).textTheme.bodyLarge?.color,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            child: const Text('Cancel'),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: _submitTask,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            child: const Text('Create'),
+          ),
+        ),
+      ],
     );
   }
 

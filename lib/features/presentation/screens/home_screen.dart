@@ -37,7 +37,7 @@ class MyHomePage extends ConsumerWidget {
           ),
         ),
       ),
-      body: const TaskList(),
+      body: SafeArea(child: const TaskList()),
       floatingActionButton: _buildAddTaskButton(),
     );
   }
